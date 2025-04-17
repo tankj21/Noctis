@@ -1,4 +1,6 @@
 import discord
+import os
+from dotenv import load_dotenv
 from discord.ext import commands
 from discord import app_commands
 
@@ -30,6 +32,8 @@ async def info(interaction: discord.Interaction, target: str):
         embed.add_field(name="サーバーID", value=guild.id, inline=False)
         embed.add_field(name="メンバー数", value=guild.member_count, inline=False)
         await interaction.response.send_message(embed=embed)
+        print("Command : /info server successfull")
+
 
     else:
         try:
@@ -47,5 +51,6 @@ async def info(interaction: discord.Interaction, target: str):
             await interaction.response.send_message("引数には `server` または ユーザーのIDを指定してください。", ephemeral=True)
 
 # Botを起動
-TOKEN = "ODMxMzg0ODY5MjAwMDY4NjI5.GTJJIN.lWV0OMMIkYAiaCwyFVSp7wjrbFaGC7yOxEcNoI"
+load_dotenv()
+TOKEN = os.getenv("DISCORD_TOKEN")
 client.run(TOKEN)
