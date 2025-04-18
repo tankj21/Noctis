@@ -31,6 +31,8 @@ class MyBot(commands.Bot):
     async def setup_hook(self):
         for ext in self.initial_extensions:
             await self.load_extension(ext)
+        guild = discord.Object(id=831385920145588244)
+        await self.tree.sync(guild=guild)
         await self.tree.sync()  # スラッシュコマンド同期
 
     async def on_ready(self):

@@ -4,7 +4,7 @@ from discord.ext import commands
 import yaml
 import os
 
-LANG_FILE_PATH = "data/guild_settings.yml"
+LANG_FILE_PATH = "data/lang_guild_settings.yml"
 LOCALE_FOLDER = "lang"
 
 # --- 多言語設定 ---
