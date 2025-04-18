@@ -1,0 +1,11 @@
+info:
+  server_title: Server Info
+  server_description: Information about this server
+  guild_name: Guild Name
+  guild_id: Guild ID
+  member_count: Member Count
+  user_title: User Info
+  user_description: Information about the specified user
+  user_name: Username
+  user_id: User ID
+  user_not_found: ❌ User not found or invalid ID.
