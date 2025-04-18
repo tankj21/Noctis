@@ -1,0 +1,1 @@
+なんかPythonでDiscordBot作ってみたくなったのでお試し。
