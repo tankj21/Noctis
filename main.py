@@ -26,6 +26,7 @@ class MyBot(commands.Bot):
             "cogs.info",
             "cogs.guild_events",
             "cogs.language",
+            "cogs.role",
         ]
 
     async def setup_hook(self):

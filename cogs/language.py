@@ -21,7 +21,7 @@ class Language(commands.Cog):
         self.bot = bot
 
     @app_commands.command(name="language", description="set guild language")
-    @app_commands.guilds(discord.Object(id=831385920145588244))
+    @app_commands.guilds(discord.Object(id=831385920145588244)) #guildコマンド陽
     @app_commands.describe(language="Choose language ex: ja , en")
     @app_commands.checks.has_permissions(administrator=True)
     async def set_language(self, interaction: discord.Interaction, language: str):
