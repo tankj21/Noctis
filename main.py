@@ -21,13 +21,21 @@ def load_translations(lang_code):
 
 class MyBot(commands.Bot):
     def __init__(self):
-        # command_prefixは空で設定、これでスラッシュコマンドのみを使用
-        super().__init__(command_prefix=None, intents=intents)  
-        self.tree = app_commands.CommandTree(self)
+        super().__init__(command_prefix=None, intents=intents)
+        self.initial_extensions = [
+            "cogs.info",
+            "cogs.guild_events",
+            "cogs.language",
+        ]
 
     async def setup_hook(self):
-        # スラッシュコマンドの同期
-        await self.tree.sync()
+        for ext in self.initial_extensions:
+            await self.load_extension(ext)
+        await self.tree.sync()  # スラッシュコマンド同期
+
+    async def on_ready(self):
+        print(f"{self.user} でログインしました")
+
 
 bot = MyBot()
 

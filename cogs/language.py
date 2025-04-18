@@ -16,7 +16,7 @@ def save_guild_settings(data):
     with open(LANG_FILE_PATH, "w", encoding="utf-8") as f:
         yaml.dump(data, f, allow_unicode=True)
 
-class Language(commands.cog):
+class Language(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
