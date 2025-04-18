@@ -59,3 +59,4 @@ class Info(commands.GroupCog, name="info"):  # GroupCogを継承するとサブ�
 
 async def setup(bot):
     await bot.add_cog(Info(bot))
+#2
