@@ -5,7 +5,7 @@ import yaml
 import os
 
 LANG_FILE_PATH = "data/guild_settings.yml"
-LOCALE_FOLDER = "locales"
+LOCALE_FOLDER = "lang"
 
 def get_guild_language(guild_id: int) -> str:
     if not os.path.exists(LANG_FILE_PATH):
@@ -59,4 +59,3 @@ class Info(commands.GroupCog, name="info"):  # GroupCogを継承するとサブ�
 
 async def setup(bot):
     await bot.add_cog(Info(bot))
-#2

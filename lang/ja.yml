@@ -8,8 +8,4 @@ info:
   user_description: 指定されたユーザーの情報です
   user_name: ユーザー名
   user_id: ユーザーID
-<<<<<<< HEAD
   user_not_found: ❌ ユーザーが見つかりませんでした。
-=======
-  user_not_found: ❌ ユーザーが見つかりませんでした。
->>>>>>> fb4aed1e8369d799ab3a68a9dd264f4682a5cfeb

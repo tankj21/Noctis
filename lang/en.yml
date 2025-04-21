@@ -8,8 +8,4 @@ info:
   user_description: Information about the specified user
   user_name: Username
   user_id: User ID
-<<<<<<< HEAD
   user_not_found: ❌ User not found or invalid ID.
-=======
-  user_not_found: ❌ User not found or invalid ID.
->>>>>>> fb4aed1e8369d799ab3a68a9dd264f4682a5cfeb
