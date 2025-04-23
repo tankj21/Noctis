@@ -3,7 +3,7 @@ from discord.ext import commands
 import yaml
 import os
 
-LANG_FILE_PATH = "data/guild_settings.yml"
+LANG_FILE_PATH = "data/lang_guild_settings.yml"
 
 def load_guild_settings():
     if not os.path.exists(LANG_FILE_PATH):

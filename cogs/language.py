@@ -4,7 +4,7 @@ from discord.ext import commands
 import yaml
 import os
 
-LANG_FILE_PATH = "data/lang_guild_setting.yml"
+LANG_FILE_PATH = "data/lang_guild_settings.yml"
 
 def load_guild_settings():
     if not os.path.exists(LANG_FILE_PATH):
@@ -16,11 +16,12 @@ def save_guild_settings(data):
     with open(LANG_FILE_PATH, "w", encoding="utf-8") as f:
         yaml.dump(data, f, allow_unicode=True)
 
-class Language(commands.cog):
+class Language(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @app_commands.command(name="language", description="set guild language")
+    @app_commands.guilds(discord.Object(id=831385920145588244)) #guildコマンド陽
     @app_commands.describe(language="Choose language ex: ja , en")
     @app_commands.checks.has_permissions(administrator=True)
     async def set_language(self, interaction: discord.Interaction, language: str):

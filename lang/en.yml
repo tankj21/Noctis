@@ -1,11 +1,17 @@
 info:
-  server_title: Server Info
-  server_description: Information about this server
-  guild_name: Guild Name
-  guild_id: Guild ID
-  member_count: Member Count
-  user_title: User Info
-  user_description: Information about the specified user
-  user_name: Username
-  user_id: User ID
-  user_not_found: ❌ User not found or invalid ID.
+  server_title: "Server Info"
+  server_description: "Detailed information about this server"
+  guild_name: "Server Name"
+  guild_id: "Server ID"
+  member_count: "Member Count"
+  owner: "Server Owner"
+  created_at: "Created At"
+  channel_count: "Number of Channels"
+
+  user_title: "User Info"
+  user_description: "Detailed information about the specified user"
+  user_name: "Username"
+  user_id: "User ID"
+  bot_flag: "Is a Bot?"
+  joined_at: "Joined Server At"
+  status: "Status"
