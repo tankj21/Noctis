@@ -181,7 +181,7 @@ class RoleGroup(app_commands.Group):
 class RoleCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bot.add_command(RoleGroup())
+        self.bot.tree.add_command(RoleGroup())
 
 async def setup(bot):
     await bot.add_cog(RoleCog(bot))
