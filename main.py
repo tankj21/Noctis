@@ -4,19 +4,22 @@ import yaml
 from dotenv import load_dotenv
 from discord.ext import commands
 from discord import app_commands
+import logging
 
 intents = discord.Intents.default()
 intents.members = True  # メンバー情報取得に必要
+
+logging.basicConfig(level=logging.INFO)
 
 def load_translations(lang_code):
     try:
         with open(f'lang/{lang_code}.yml', 'r', encoding='utf-8') as f:
             return yaml.safe_load(f)
     except FileNotFoundError:
-        print(f"エラー: 言語ファイル {lang_code}.yml が見つかりませんでした")
+        logging.info(f"エラー: 言語ファイル {lang_code}.yml が見つかりませんでした")
         return {}  # デフォルトで空の辞書を返す
     except yaml.YAMLError as e:
-        print(f"YAMLエラー: {e}")
+        logging.info(f"YAMLエラー: {e}")
         return {}
 
 class MyBot(commands.Bot):
@@ -37,7 +40,7 @@ class MyBot(commands.Bot):
         await self.tree.sync()  # スラッシュコマンド同期
 
     async def on_ready(self):
-        print(f"{self.user} でログインしました")
+        logging.info(f"{self.user} でログインしました")
 
 
 bot = MyBot()
