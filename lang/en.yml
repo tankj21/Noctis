@@ -15,3 +15,7 @@ info:
   bot_flag: "Is a Bot?"
   joined_at: "Joined Server At"
   status: "Status"
+ping:
+  title: "🏓 Pong!"
+  websocket_latency: "WebSocket Latency"
+  response_time: "Response Time"

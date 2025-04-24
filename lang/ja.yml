@@ -15,3 +15,7 @@ info:
   bot_flag: "Botですか？"
   joined_at: "サーバー参加日"
   status: "ステータス"
+ping:
+  title: "🏓 ポン！"
+  websocket_latency: "WebSocket レイテンシ"
+  response_time: "応答時間"
