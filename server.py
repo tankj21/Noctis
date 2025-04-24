@@ -1,15 +1,17 @@
+from threading import Thread
 
-import threading
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from fastapi import FastAPI
+import uvicorn
 
-def run_server():
-    class Handler(BaseHTTPRequestHandler):
-        def do_GET(self):
-            self.send_response(200)
-            self.end_headers()
-            self.wfile.write(b'OK')
+app = FastAPI()
 
-    server = HTTPServer(('0.0.0.0', 8000), Handler)
-    server.serve_forever()
+@app.get("/")
+async def root():
+	return {"message": "Server is Online."}
 
-threading.Thread(target=run_server, daemon=True).start()
+def start():
+	uvicorn.run(app, host="0.0.0.0", port=8080)
+
+def server_thread():
+	t = Thread(target=start)
+	t.start()
