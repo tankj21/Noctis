@@ -1,2 +1,1 @@
-web: python main.py
-web: python server.py
+web: python main.py | server.py
