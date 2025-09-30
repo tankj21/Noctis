@@ -10,7 +10,7 @@ class SlotGroup(app_commands.Group):
     
     SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣']
     SYMBOL_WEIGHTS = [30, 25, 20, 15, 7, 3]
-    JACKPOT_CONTRIBUTION = 0.05  # ベット額の5%がジャックポットに積み立て
+    JACKPOT_CONTRIBUTION = 1.00  # ベット額の5%がジャックポットに積み立て
 
     def __init__(self):
         super().__init__(name="slot", description="スロットマシン関連コマンド")
@@ -194,13 +194,14 @@ class SlotGroup(app_commands.Group):
             )
             return
         
-        # ジャックポットに積み立て
-        jackpot_contribution = int(bet * self.JACKPOT_CONTRIBUTION)
-        self.add_to_jackpot(jackpot_contribution)
-        
         # スロットを回す
         result = self.spin_slot()
         win = self.calculate_win(result, bet)
+        
+        # 負けた時だけジャックポットに積み立て
+        if win == 0:
+            jackpot_contribution = int(bet * self.JACKPOT_CONTRIBUTION)
+            self.add_to_jackpot(jackpot_contribution)
         
         # ジャックポット判定
         is_jackpot = (win == 'JACKPOT')
@@ -291,7 +292,7 @@ class SlotGroup(app_commands.Group):
         
         embed.add_field(
             name='📝 積み立てについて',
-            value=f'各プレイのベット額の{int(self.JACKPOT_CONTRIBUTION*100)}%がジャックポットに積み立てられます',
+            value=f'負けた時のベット額の{int(self.JACKPOT_CONTRIBUTION*100)}%がジャックポットに積み立てられます',
             inline=False
         )
         
@@ -388,7 +389,7 @@ class SlotGroup(app_commands.Group):
         )
         embed.add_field(
             name='🎰 ジャックポットについて',
-            value=f'ベット額の{int(self.JACKPOT_CONTRIBUTION*100)}%がジャックポットに積み立てられ、7️⃣が3つ揃うと全額獲得できます！',
+            value=f'負けた時のベット額の{int(self.JACKPOT_CONTRIBUTION*100)}%がジャックポットに積み立てられ、7️⃣が3つ揃うと全額獲得できます！',
             inline=False
         )
         embed.set_footer(text='初期コイン: 1000 | 初期ジャックポット: 10,000')
