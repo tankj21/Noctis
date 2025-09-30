@@ -15,3 +15,9 @@ env/
 #secret
 config.json
 *.secret
+
+#log
+*.log
+
+#db
+*.db
