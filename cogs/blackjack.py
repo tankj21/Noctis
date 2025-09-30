@@ -180,7 +180,8 @@ class BlackjackGroup(app_commands.Group):
             'coins': user[1],
             'total_wins': user[2],
             'total_losses': user[3],
-            'biggest_win': user[4]
+            'biggest_win': user[4],
+            'bankruptcy_count': int(user[5]) if len(user) > 5 and user[5] is not None else 0
         }
     
     def update_user(self, user_id, coins, is_win, win_amount):

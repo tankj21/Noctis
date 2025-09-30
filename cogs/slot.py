@@ -32,6 +32,13 @@ class SlotGroup(app_commands.Group):
             )
         ''')
         
+        # 既存のテーブルにbankruptcy_countカラムが存在しない場合は追加
+        cursor.execute("PRAGMA table_info(users)")
+        columns = [column[1] for column in cursor.fetchall()]
+        if 'bankruptcy_count' not in columns:
+            cursor.execute('ALTER TABLE users ADD COLUMN bankruptcy_count INTEGER DEFAULT 0')
+            conn.commit()
+        
         # ジャックポット用テーブル
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS jackpot (
@@ -123,7 +130,7 @@ class SlotGroup(app_commands.Group):
             'total_wins': user[2],
             'total_losses': user[3],
             'biggest_win': user[4],
-            'bankruptcy_count': user[5] if len(user) > 5 else 0
+            'bankruptcy_count': int(user[5]) if len(user) > 5 and user[5] is not None else 0
         }
 
     def update_user(self, user_id, coins, is_win, win_amount):
