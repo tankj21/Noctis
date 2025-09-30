@@ -10,7 +10,7 @@ class SlotGroup(app_commands.Group):
     
     SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣']
     SYMBOL_WEIGHTS = [30, 25, 20, 15, 7, 3]
-    JACKPOT_CONTRIBUTION = 1.00  # ベット額の5%がジャックポットに積み立て
+    JACKPOT_CONTRIBUTION = 0.05  # ベット額の5%がジャックポットに積み立て
 
     def __init__(self):
         super().__init__(name="slot", description="スロットマシン関連コマンド")
@@ -26,6 +26,7 @@ class SlotGroup(app_commands.Group):
                 total_wins INTEGER DEFAULT 0,
                 total_losses INTEGER DEFAULT 0,
                 biggest_win INTEGER DEFAULT 0,
+                bankruptcy_count INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 last_played TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
@@ -121,7 +122,8 @@ class SlotGroup(app_commands.Group):
             'coins': user[1],
             'total_wins': user[2],
             'total_losses': user[3],
-            'biggest_win': user[4]
+            'biggest_win': user[4],
+            'bankruptcy_count': user[5] if len(user) > 5 else 0
         }
 
     def update_user(self, user_id, coins, is_win, win_amount):
@@ -146,6 +148,21 @@ class SlotGroup(app_commands.Group):
             SELECT user_id, coins, total_wins, total_losses 
             FROM users 
             ORDER BY coins DESC 
+            LIMIT ?
+        ''', (limit,))
+        results = cursor.fetchall()
+        conn.close()
+        return results
+    
+    def get_bankruptcy_ranking(self, limit=10):
+        """破産回数ランキングを取得"""
+        conn = sqlite3.connect('slot_bot.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT user_id, bankruptcy_count, coins
+            FROM users 
+            WHERE bankruptcy_count > 0
+            ORDER BY bankruptcy_count DESC 
             LIMIT ?
         ''', (limit,))
         results = cursor.fetchall()
@@ -188,10 +205,16 @@ class SlotGroup(app_commands.Group):
         user = self.get_user(user_id)
         
         if user['coins'] < bet:
-            await interaction.response.send_message(
-                f"コインが足りません！現在のコイン: {user['coins']}",
-                ephemeral=True
-            )
+            if user['coins'] == 0:
+                await interaction.response.send_message(
+                    f"💔 コインが0になってしまいました！\n\n`/slot bonus` コマンドで500コインを受け取ることができます。",
+                    ephemeral=True
+                )
+            else:
+                await interaction.response.send_message(
+                    f"コインが足りません！現在のコイン: {user['coins']}",
+                    ephemeral=True
+                )
             return
         
         # スロットを回す
@@ -317,6 +340,7 @@ class SlotGroup(app_commands.Group):
         embed.add_field(name='最大勝利額', value=f"{user['biggest_win']:,} コイン", inline=True)
         embed.add_field(name='勝率', value=f"{win_rate:.1f}%", inline=True)
         embed.add_field(name='総プレイ回数', value=f"{total_plays}", inline=True)
+        embed.add_field(name='💔 破産回数', value=f"{user['bankruptcy_count']}回", inline=True)
         
         await interaction.response.send_message(embed=embed)
 
@@ -344,6 +368,35 @@ class SlotGroup(app_commands.Group):
             title='🏆 コイン ランキング TOP 10',
             description=ranking_text,
             color=discord.Color.gold(),
+            timestamp=datetime.now()
+        )
+        
+        await interaction.response.send_message(embed=embed)
+    
+    @app_commands.command(name="bankruptcy", description="破産回数ランキングを表示します")
+    async def bankruptcy_ranking(self, interaction: discord.Interaction):
+        """破産回数ランキングを表示"""
+        top_bankrupts = self.get_bankruptcy_ranking(10)
+        
+        if not top_bankrupts:
+            await interaction.response.send_message('まだ破産したプレイヤーがいません', ephemeral=True)
+            return
+        
+        ranking_text = ''
+        for i, (user_id, bankruptcy_count, coins) in enumerate(top_bankrupts, 1):
+            try:
+                user = await interaction.client.fetch_user(int(user_id))
+                username = user.name
+            except:
+                username = 'Unknown User'
+            
+            medal = '💀' if i == 1 else '👻' if i == 2 else '☠️' if i == 3 else f'{i}.'
+            ranking_text += f'{medal} **{username}** - {bankruptcy_count}回破産 (現在: {coins:,}コイン)\n'
+        
+        embed = discord.Embed(
+            title='💔 破産回数ランキング TOP 10',
+            description=ranking_text + '\n\n*破産は名誉の勲章！挑戦し続けた証です！*',
+            color=discord.Color.dark_red(),
             timestamp=datetime.now()
         )
         
@@ -378,6 +431,16 @@ class SlotGroup(app_commands.Group):
             inline=False
         )
         embed.add_field(
+            name='/slot bankruptcy',
+            value='破産回数ランキングを表示します',
+            inline=False
+        )
+        embed.add_field(
+            name='/slot bonus',
+            value='コインが0の時に500コインを受け取ります',
+            inline=False
+        )
+        embed.add_field(
             name='/slot help',
             value='このヘルプを表示します',
             inline=False
@@ -393,6 +456,53 @@ class SlotGroup(app_commands.Group):
             inline=False
         )
         embed.set_footer(text='初期コイン: 1000 | 初期ジャックポット: 10,000')
+        
+        await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="bonus", description="コインが0の時に500コインを受け取ります")
+    async def bonus(self, interaction: discord.Interaction):
+        """ボーナスコインを受け取る"""
+        user_id = interaction.user.id
+        user = self.get_user(user_id)
+        
+        if user['coins'] > 0:
+            await interaction.response.send_message(
+                f'まだコインが残っています！（現在: {user["coins"]:,} コイン）\n\nボーナスはコインが0の時のみ受け取れます。',
+                ephemeral=True
+            )
+            return
+        
+        # 500コインを付与し、破産回数をカウント
+        bonus_amount = 500
+        conn = sqlite3.connect('slot_bot.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE users 
+            SET coins = ?, 
+                bankruptcy_count = bankruptcy_count + 1 
+            WHERE user_id = ?
+        ''', (bonus_amount, str(user_id)))
+        conn.commit()
+        conn.close()
+        
+        new_bankruptcy_count = user['bankruptcy_count'] + 1
+        
+        embed = discord.Embed(
+            title='🎁 ボーナス獲得！',
+            description=f'**{bonus_amount} コイン**を受け取りました！',
+            color=discord.Color.green()
+        )
+        embed.add_field(
+            name='💰 現在のコイン',
+            value=f'{bonus_amount} コイン',
+            inline=True
+        )
+        embed.add_field(
+            name='💔 破産回数',
+            value=f'{new_bankruptcy_count}回目',
+            inline=True
+        )
+        embed.set_footer(text='諦めずに挑戦し続けよう！')
         
         await interaction.response.send_message(embed=embed)
 
