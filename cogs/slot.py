@@ -10,7 +10,7 @@ class SlotGroup(app_commands.Group):
     
     SYMBOLS = ['🍒', '🍋', '🍊', '🍇', '💎', '7️⃣']
     SYMBOL_WEIGHTS = [30, 25, 20, 15, 7, 3]
-    JACKPOT_CONTRIBUTION = 0.05  # ベット額の5%がジャックポットに積み立て
+    JACKPOT_CONTRIBUTION = 1.00  # ベット額の5%がジャックポットに積み立て
 
     def __init__(self):
         super().__init__(name="slot", description="スロットマシン関連コマンド")
@@ -112,7 +112,10 @@ class SlotGroup(app_commands.Group):
     def get_user(self, user_id):
         conn = sqlite3.connect('slot_bot.db')
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM users WHERE user_id = ?', (str(user_id),))
+        cursor.execute('''
+            SELECT user_id, coins, total_wins, total_losses, biggest_win, bankruptcy_count
+            FROM users WHERE user_id = ?
+        ''', (str(user_id),))
         user = cursor.fetchone()
 
         if not user:
@@ -120,7 +123,10 @@ class SlotGroup(app_commands.Group):
                 'INSERT INTO users (user_id, coins) VALUES (?, 1000)', (str(user_id),)
             )
             conn.commit()
-            cursor.execute('SELECT * FROM users WHERE user_id = ?', (str(user_id),))
+            cursor.execute('''
+                SELECT user_id, coins, total_wins, total_losses, biggest_win, bankruptcy_count
+                FROM users WHERE user_id = ?
+            ''', (str(user_id),))
             user = cursor.fetchone()
 
         conn.close()
@@ -130,7 +136,7 @@ class SlotGroup(app_commands.Group):
             'total_wins': user[2],
             'total_losses': user[3],
             'biggest_win': user[4],
-            'bankruptcy_count': int(user[5]) if len(user) > 5 and user[5] is not None else 0
+            'bankruptcy_count': int(user[5]) if user[5] is not None else 0
         }
 
     def update_user(self, user_id, coins, is_win, win_amount):
