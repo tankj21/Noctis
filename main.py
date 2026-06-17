@@ -37,6 +37,7 @@ class MyBot(commands.Bot):
             "cogs.ping",
             "cogs.slot",
             "cogs.blackjack",
+            "cogs.roulette",
         ]
 
     async def setup_hook(self):
